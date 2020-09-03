@@ -1,16 +1,8 @@
 #! /bin/bash
 set -ex
 
-dpkg -i /mnt/root/linux*.deb
-
-echo 'ubuntu-bionic' > /etc/hostname
-passwd -d root
-mkdir /etc/systemd/system/serial-getty@ttyS0.service.d/
-cat <<EOF > /etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --autologin root -o '-p -- \\u' --keep-baud 115200,38400,9600 %I $TERM
-EOF
+echo 'ubuntu' > /etc/hostname
+echo root:root | chpasswd
 
 cat <<EOF > /etc/netplan/99_config.yaml
 network:
@@ -19,5 +11,12 @@ network:
   ethernets:
     eth0:
       dhcp4: true
+      nameservers:
+       addresses: [114.114.114.114,8.8.8.8]
 EOF
+
 netplan generate
+
+sed -i '/security.ubuntu.com/d' /etc/apt/sources.list
+
+apt-get update

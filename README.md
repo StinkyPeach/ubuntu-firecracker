@@ -4,7 +4,8 @@ Docker container to build a linux kernel and ext4 rootfs compatible with [firecr
 ## Usage
 Build the container:
 ```shell
-docker build -t ubuntu-firecracker .
+# linux kernel 4.18.0 release ubuntu:bionic
+docker build -t ubuntu-firecracker . 
 ```
 
 Build the image:
@@ -16,12 +17,13 @@ Start the image with firectl
 ```shell
 # copy image and kernel
 cp output/vmlinux ubuntu-vmlinux
-cp output/image.ext4 ubuntu.ext4
+cp output/image.ext4 ubuntu-rootfs.ext4
 # resize image
-truncate -s 5G ubuntu.ext4
-resize2fs ubuntu.ext4
+truncate -s 5G ubuntu-rootfs.ext4
+e2fsck -f ubuntu-rootfs.ext4
+resize2fs ubuntu-rootfs.ext4
 #launch firecracker
-firectl --kernel=ubuntu-vmlinux --root-drive=ubuntu.ext4 --kernel-opts="init=/bin/systemd noapic reboot=k panic=1 pci=off nomodules console=ttyS0"
+firectl --kernel=ubuntu-vmlinux --root-drive=ubuntu-rootfs.ext4 --kernel-opts="init=/bin/systemd noapic reboot=k panic=1 pci=off nomodules console=ttyS0"
 ```
 
 ## Contributions

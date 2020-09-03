@@ -6,12 +6,14 @@ rm -rf /output/*
 cp /root/linux-source-$KERNEL_SOURCE_VERSION/vmlinux /output/vmlinux
 cp /root/linux-source-$KERNEL_SOURCE_VERSION/.config /output/config
 
-truncate -s 1G /output/image.ext4
+truncate -s 2G /output/image.ext4
 mkfs.ext4 /output/image.ext4
 
 mount /output/image.ext4 /rootfs
-debootstrap --include openssh-server,netplan.io,nano bionic /rootfs http://archive.ubuntu.com/ubuntu/
+debootstrap --include openssh-server,netplan.io,nano bionic /rootfs http://mirrors.aliyun.com/ubuntu/
 mount --bind / /rootfs/mnt
+
+cp -b /etc/apt/sources.list /rootfs/etc/apt/
 
 chroot /rootfs /bin/bash /mnt/script/provision.sh
 
